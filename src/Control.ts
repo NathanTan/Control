@@ -1,3 +1,9 @@
 // compile with npx tsc
 
-console.log("hello")
+class Control {
+    constructor() {
+        let numberOfPlayers = 2;
+    }
+}
+
+export default Control
