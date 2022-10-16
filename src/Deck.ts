@@ -1,16 +1,33 @@
+import Card from "./Card"
+import CardType from "./Enums/CardType"
+
+// For 2 players the deck will exist within the player and both players will have even decks
+// For a 3-4 player game the players will all share a deck double the size of a deck from the /2 player game 
+
 class Deck {
-    private deck: number[]
-    constructor(numberOfPlayers) {
-        // put the cards in the deck
-        if (numberOfPlayers == 2) {
-            // We need 2 equal decks
-            for (let i = 0; i < 9; i++) {
-                this.deck.push(i + 1)
-                this.deck.push(i + 1)
+    private deck: Card[]
+    constructor(numberOfPlayers: number) {
+        this.deck = [] as Card[]
+
+        const multiplier = (numberOfPlayers == 2) ? 1 : 2
+
+        // Put the cards in the deck
+        // Adding the Stable Fuel
+        for (let i = 0; i < 5; i++) {
+            for (let j = 0; j < 2 * multiplier; j++) {
+                this.deck.push({number: i + 1, type: CardType.Stable} as Card)
             }
-        } else {
-            console.log("todo deck")
         }
+        // Adding the Unstable Fuel
+        for (let i = 0; i < 7; i++) {
+            for (let j = 0; j < 2 * multiplier; j++) {
+                this.deck.push({number: i + 4, type: CardType.Unstable} as Card)
+            }
+        }
+    }
+
+    public drawCard(): Card | undefined {
+        return this.deck.pop()
     }
 }
 
