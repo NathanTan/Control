@@ -3,6 +3,8 @@ import Config from "./Interfaces/Config"
 import Status from "./Interfaces/Status"
 import Player from "./Player"
 import PlayerData from "./Interfaces/PlayerData"
+import Card from "./Interfaces/Card"
+import Action from "./Enums/Action"
 
 class Control {
     public players: Player[]
@@ -45,6 +47,23 @@ class Control {
         playerData.discardPile = player.getDiscardPile().split(",")
 
         return playerData
+    }
+
+    public conductTurn() {
+        // Draw
+        
+        if (this.numberOfPlayers == 2) {
+            this.players[this.turn % this.numberOfPlayers].draw()
+        }
+
+        // Get user's move
+        // executeMove
+        //      Allow for interuption
+        // Check if the game is over
+    }
+
+    public move(card: Card, action: Action) {
+        
     }
 }
 

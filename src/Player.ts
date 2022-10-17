@@ -1,7 +1,7 @@
 import Deck from "./Deck"
-import Action from "./Action"
+import Action from "./Enums/Action"
 import PlayResult from "./PlayResult"
-import Card from "./Card"
+import Card from "./Interfaces/Card"
 import CardConstants from "./Constants/CardConstants"
 import CardType from "./Enums/CardType"
 
@@ -28,6 +28,19 @@ class Player {
         this.testing = testing
         //@ts-ignore
         this.drawInitalHand(this.deck ?? deck) // one of these will have a deck depending on the number of players
+    }
+
+    public draw(deck?: Deck) {  
+        if (deck === null || deck === undefined) {
+            let card: Card | undefined
+            if (this.deck !== null) {
+                card = this.deck.drawCard()
+                console.log(card)
+                if (card !== undefined) {
+                    this.hand.push(card)
+                }
+            }
+        }
     }
 
     public runAction(action: Action, card?: Card): PlayResult | undefined {

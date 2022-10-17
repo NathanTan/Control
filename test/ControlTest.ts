@@ -2,11 +2,13 @@ var assert = require('assert')
 import Control from "../src/Control"
 import Status from "../src/Interfaces/Status"
 import Config from "../src/Interfaces/Config"
+import PlayerData from "../src/Interfaces/PlayerData"
 
 
 const config = {
     numberOfPlayers: 2,
-    playerNames: ["bot1", "bot2"]
+    playerNames: ["bot1", "bot2"],
+    testing: true
 } as Config
 
 describe('Control config handling', () => {
@@ -20,5 +22,21 @@ describe('Control config handling', () => {
 
         assert.strictEqual(JSON.stringify(expectedStatus),
             JSON.stringify(game.getStatus()))
+    })
+
+    it('Handles playing a 10', () => {
+        const game = new Control(config)
+        const expectedPlayer0Data = {
+            name: "bot1",
+            deckSize: 19,
+            hand: ["10 u","10 u","9 u","9 u", "8 u"],
+            field: [""],
+            discardPile: [""]
+        } as PlayerData
+
+        game.conductTurn()
+
+        assert.strictEqual(JSON.stringify(expectedPlayer0Data),
+            JSON.stringify(game.getPlayerData(0)))
     })
 }) 

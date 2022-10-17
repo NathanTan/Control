@@ -1,6 +1,5 @@
 var assert = require('assert')  
 import Control from "../src/Control"
-import Status from "../src/Interfaces/Status"
 import Config from "../src/Interfaces/Config"
 import PlayerData from "../src/Interfaces/PlayerData"
 

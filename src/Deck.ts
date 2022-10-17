@@ -1,4 +1,4 @@
-import Card from "./Card"
+import Card from "./Interfaces/Card"
 import CardType from "./Enums/CardType"
 
 // For 2 players the deck will exist within the player and both players will have even decks

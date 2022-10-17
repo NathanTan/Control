@@ -1,4 +1,4 @@
-import CardType from "./Enums/CardType"
+import CardType from "../Enums/CardType"
 
 interface Card {
     number: number
