@@ -2,10 +2,10 @@ import Deck from "./Deck"
 import Action from "./Action"
 import PlayResult from "./PlayResult"
 import Card from "./Card"
-import CardType from "./Enums/CardType"
 import CardConstants from "./Constants/CardConstants"
 
 class Player {
+    public name: string
     public hand: Card[]
     public deck: Deck | null
     public field: Card[]
@@ -13,7 +13,8 @@ class Player {
     public turnActions: Action[]
     private numberOfPlayers: number
 
-    constructor(numberOfPlayers: number) {
+    constructor(name: string, numberOfPlayers: number) {
+        this.name = name
         this.numberOfPlayers = numberOfPlayers
         this.deck = (numberOfPlayers == 2) ? new Deck(numberOfPlayers) : null
         this.hand = [] as Card[]
@@ -61,6 +62,14 @@ class Player {
 
     public getHand(): string {
         return this.hand.join(" ")
+    }
+
+    public getField(): string {
+        return this.field.join(" ")
+    }
+
+    public getDiscardPile(): string {
+        return this.graveyard.join(" ")
     }
 
     private drawFromPersonalDeck() {

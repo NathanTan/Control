@@ -1,8 +1,13 @@
 {
   "scripts": {
-    "build": "npx tsc"
+    "build": "npx tsc",
+    "test": "./node_modules/ts-mocha/bin/ts-mocha -p tsconfig.json test/**/*Test.ts"
   },
   "devDependencies": {
+    "@types/expect": "^24.3.0",
+    "@types/mocha": "^10.0.0",
+    "mocha": "^5.2.0",
+    "ts-mocha": "^10.0.0",
     "typescript": "^4.8.4"
   }
 }

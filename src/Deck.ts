@@ -29,6 +29,10 @@ class Deck {
     public drawCard(): Card | undefined {
         return this.deck.pop()
     }
+
+    public getDeckSize(): number {
+        return this.deck.length
+    }
 }
 
 export default Deck
