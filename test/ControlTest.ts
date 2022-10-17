@@ -42,6 +42,13 @@ describe('Control config handling', () => {
             discardPile: [""]
         } as PlayerData
 
+        const expectedGameStatus = {
+            turnCount: 2,
+            turn: 0,
+            gameOver: false,
+
+        } as Status
+
         game.conductTurn()
         game.conductTurn()
 
@@ -50,5 +57,8 @@ describe('Control config handling', () => {
         
         assert.strictEqual(JSON.stringify(expectedPlayer1Data),
             JSON.stringify(game.getPlayerData(1)))
+        
+        assert.strictEqual(JSON.stringify(expectedGameStatus),
+            JSON.stringify(game.getStatus()))
     })
 }) 

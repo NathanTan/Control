@@ -63,6 +63,14 @@ class Control {
         this.players[playersTurn].runAction(playersAction)
         //      Allow for interuption
         // Check if the game is over
+        let gameIsOver = false
+        for (let i = 0; i < this.numberOfPlayers; i++) {
+            const playerScore = this.players[i].field.reduce((total, card) => {
+                return total + card.number;
+            }, 0)
+            if (playerScore >= 21) 
+                gameIsOver = true
+        }
 
         // Increment turn
         this.turn++
