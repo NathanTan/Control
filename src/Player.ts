@@ -35,7 +35,6 @@ class Player {
             let card: Card | undefined
             if (this.deck !== null) {
                 card = this.deck.drawCard()
-                console.log(card)
                 if (card !== undefined) {
                     this.hand.push(card)
                 }
@@ -45,7 +44,8 @@ class Player {
 
     public runAction(action: Action, card?: Card): PlayResult | undefined {
         // Check if the card is not in the hand
-        if (card == undefined || card == null || this.hand.indexOf(card) == -1) {
+        // Validation
+        if (action !== Action.Draw && (card == undefined || card == null || this.hand.indexOf(card) == -1)) {
             return undefined
         }
 
@@ -55,24 +55,26 @@ class Player {
             case Action.Draw:
                 if (this.numberOfPlayers == 2)
                     this.drawFromPersonalDeck()
-                else 
+                else {
                     console.log("TODO drawFromGroupDeck")
+                    this.draw() // TODO: pass in group deck
+                }
                 break
             case Action.Play:
-                this.play(card)
+                this.play(card ?? {} as Card) // TODO fix fallback
                 break
             case Action.Activate:
                 // Validation
-                if (CardConstants.CardsThatCanBeDiscarded.indexOf(card.number) == -1) {
+                if (card !== undefined && CardConstants.CardsThatCanBeDiscarded.indexOf(card.number) == -1) {
                     console.log("[ERROR] Cannot discard a stable fuel for effect now")
                     break
                 }
 
                 // Discard
-                this.discard(card)
+                this.discard(card ?? {} as Card) // TODO fix fallback
                 break
             case Action.Diffuse:
-                result = this.diffuse(card)
+                result = this.diffuse(card ?? {} as Card) // TODO fix fallback
                 break
         }
 

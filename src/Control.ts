@@ -50,16 +50,22 @@ class Control {
     }
 
     public conductTurn() {
+        const playersTurn = this.turn % this.numberOfPlayers // The index of which player's turn it is
         // Draw
         
         if (this.numberOfPlayers == 2) {
-            this.players[this.turn % this.numberOfPlayers].draw()
+            this.players[playersTurn].draw()
         }
 
         // Get user's move
+        let playersAction = Action.Draw
         // executeMove
+        this.players[playersTurn].runAction(playersAction)
         //      Allow for interuption
         // Check if the game is over
+
+        // Increment turn
+        this.turn++
     }
 
     public move(card: Card, action: Action) {

@@ -28,15 +28,27 @@ describe('Control config handling', () => {
         const game = new Control(config)
         const expectedPlayer0Data = {
             name: "bot1",
-            deckSize: 19,
-            hand: ["10 u","10 u","9 u","9 u", "8 u"],
+            deckSize: 18,
+            hand: ["10 u","10 u","9 u","9 u", "8 u", "8 u"],
+            field: [""],
+            discardPile: [""]
+        } as PlayerData
+
+        const expectedPlayer1Data = {
+            name: "bot2",
+            deckSize: 17,
+            hand: ["10 u","10 u","9 u","9 u", "8 u", "8 u", "7 u"],
             field: [""],
             discardPile: [""]
         } as PlayerData
 
         game.conductTurn()
+        game.conductTurn()
 
         assert.strictEqual(JSON.stringify(expectedPlayer0Data),
             JSON.stringify(game.getPlayerData(0)))
+        
+        assert.strictEqual(JSON.stringify(expectedPlayer1Data),
+            JSON.stringify(game.getPlayerData(1)))
     })
 }) 
