@@ -9,16 +9,18 @@ class Control {
     public turn: number
     private numberOfPlayers: number
     private gameOver: boolean
+    private testing?: boolean
     constructor(config: Config) {
         // todo: validate config
         
         this.turn = 0
         this.numberOfPlayers = config.numberOfPlayers
         this.gameOver = false
+        this.testing = config.testing ?? false
 
         this.players = [] as Player[]
         for (let i = 0; i < this.numberOfPlayers; i++) {
-            this.players.push(new Player(config.playerNames[i], this.numberOfPlayers))
+            this.players.push(new Player(config.playerNames[i], this.numberOfPlayers, i, this.testing))
         }
 
     }
@@ -36,10 +38,11 @@ class Control {
         const playerData = {} as PlayerData
         const player = this.players[playerNumber]
         const playerDeckSize = player.deck?.getDeckSize()
+        playerData.name = player.name
         playerData.deckSize = playerDeckSize ?? 0
-        playerData.hand = player.getHand().split(" ")
-        playerData.field = player.getField().split(" ")
-        playerData.discardPile = player.getDiscardPile().split(" ")
+        playerData.hand = player.getHand().split(",")
+        playerData.field = player.getField().split(",")
+        playerData.discardPile = player.getDiscardPile().split(",")
 
         return playerData
     }

@@ -3,6 +3,7 @@ import Action from "./Action"
 import PlayResult from "./PlayResult"
 import Card from "./Card"
 import CardConstants from "./Constants/CardConstants"
+import CardType from "./Enums/CardType"
 
 class Player {
     public name: string
@@ -12,15 +13,21 @@ class Player {
     public graveyard: Card[]
     public turnActions: Action[]
     private numberOfPlayers: number
+    private playerIndex: number
+    private testing: boolean
 
-    constructor(name: string, numberOfPlayers: number) {
+    constructor(name: string, numberOfPlayers: number, playerIndex: number, testing: boolean, deck?: Deck) {
         this.name = name
         this.numberOfPlayers = numberOfPlayers
-        this.deck = (numberOfPlayers == 2) ? new Deck(numberOfPlayers) : null
+        this.deck = (numberOfPlayers == 2) ? new Deck(numberOfPlayers, testing) : null
         this.hand = [] as Card[]
         this.field = [] as Card[]
         this.graveyard = [] as Card[]
         this.turnActions = [] as Action[]
+        this.playerIndex = playerIndex
+        this.testing = testing
+        //@ts-ignore
+        this.drawInitalHand(this.deck ?? deck) // one of these will have a deck depending on the number of players
     }
 
     public runAction(action: Action, card?: Card): PlayResult | undefined {
@@ -61,15 +68,15 @@ class Player {
     }
 
     public getHand(): string {
-        return this.hand.join(" ")
+        return this.hand.map(c => c.number + " " + ((c.type === CardType.Stable) ? "s" : "u") ).join(",")
     }
 
     public getField(): string {
-        return this.field.join(" ")
+        return this.field.map(c => c.number + " " + (c.type === CardType.Stable) ? "s" : "u" ).join(",")
     }
 
     public getDiscardPile(): string {
-        return this.graveyard.join(" ")
+        return this.graveyard.map(c => c.number + " " + (c.type === CardType.Stable) ? "s" : "u" ).join(",")
     }
 
     private drawFromPersonalDeck() {
@@ -143,6 +150,14 @@ class Player {
         result.diffuseValue = discardedCard.number
 
         return result
+    }
+
+    private drawInitalHand(deck: Deck) {  
+        const handCount = (this.playerIndex === 0) ? 4 : 5
+        for (let i = 0; i < handCount; i++) {
+            const card = deck.drawCard()
+            this.hand.push(card ?? {number: -1, type: -1})
+        }
     }
 }
 

@@ -6,7 +6,7 @@ import CardType from "./Enums/CardType"
 
 class Deck {
     private deck: Card[]
-    constructor(numberOfPlayers: number) {
+    constructor(numberOfPlayers: number, testing?: boolean) {
         this.deck = [] as Card[]
 
         const multiplier = (numberOfPlayers == 2) ? 1 : 2
@@ -23,6 +23,10 @@ class Deck {
             for (let j = 0; j < 2 * multiplier; j++) {
                 this.deck.push({number: i + 4, type: CardType.Unstable} as Card)
             }
+        }
+
+        if (!testing) {
+            this.deck.sort(() => Math.random() - 0.5);
         }
     }
 
