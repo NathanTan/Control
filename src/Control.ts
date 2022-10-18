@@ -49,18 +49,18 @@ class Control {
         return playerData
     }
 
-    public conductTurn() {
+    public conductTurn(playersAction: Action, card?: Card) {
         const playersTurn = this.turn % this.numberOfPlayers // The index of which player's turn it is
-        // Draw
-        
-        if (this.numberOfPlayers == 2) {
+
+        // Draw, except on the first players first turn
+        if (this.numberOfPlayers == 2 && this.turn > 0) {
             this.players[playersTurn].draw()
         }
 
         // Get user's move
-        let playersAction = Action.Draw
+
         // executeMove
-        this.players[playersTurn].runAction(playersAction)
+        this.players[playersTurn].runAction(playersAction, card)
         //      Allow for interuption
         // Check if the game is over
         let gameIsOver = false

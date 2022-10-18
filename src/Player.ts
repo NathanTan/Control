@@ -45,7 +45,9 @@ class Player {
     public runAction(action: Action, card?: Card): PlayResult | undefined {
         // Check if the card is not in the hand
         // Validation
-        if (action !== Action.Draw && (card == undefined || card == null || this.hand.indexOf(card) == -1)) {
+        let cardPosition = this.checkHandForCard(card)
+        
+        if (action !== Action.Draw && (card === undefined || card === null || cardPosition === -1)) {
             return undefined
         }
 
@@ -61,7 +63,11 @@ class Player {
                 }
                 break
             case Action.Play:
-                this.play(card ?? {} as Card) // TODO fix fallback
+                if (card)
+                    this.play(card, cardPosition) // TODO fix fallback
+                else {
+                    console.log("[ERROR] No card to play")
+                }
                 break
             case Action.Activate:
                 // Validation
@@ -87,11 +93,11 @@ class Player {
     }
 
     public getField(): string {
-        return this.field.map(c => c.number + " " + (c.type === CardType.Stable) ? "s" : "u" ).join(",")
+        return this.field.map(c => c.number + " " + ((c.type === CardType.Stable) ? "s" : "u")).join(",")
     }
 
     public getDiscardPile(): string {
-        return this.graveyard.map(c => c.number + " " + (c.type === CardType.Stable) ? "s" : "u" ).join(",")
+        return this.graveyard.map(c => c.number + " " + ((c.type === CardType.Stable) ? "s" : "u")).join(",")
     }
 
     private drawFromPersonalDeck() {
@@ -100,11 +106,15 @@ class Player {
             this.hand.push(drawnCard)
     }
 
-    private play(card: Card): PlayResult {
+    // handPosition is the position of the card in the hand
+    private play(card: Card, handPosition: number): PlayResult {
         const result = {success: false, next: undefined, playersScore: -1 } as PlayResult
 
-        // Play the card
-        this.field.push(card)
+        // Remove the card from the hand
+        this.hand.splice(handPosition, 1)
+
+        // Play the card on the field
+        this.field.push(card as Card)
 
         // Potentially activate the card
         switch(card.number) {
@@ -118,7 +128,7 @@ class Player {
                 console.log("[DEBUG] Activate 4")
                 break
             default:
-                console.log("[DEBUG] No effect to activate")
+                console.log(`[DEBUG] No effect to activate for card {${card.number} ${card.type}}`)
         }
         
         result.success = true
@@ -173,6 +183,15 @@ class Player {
             const card = deck.drawCard()
             this.hand.push(card ?? {number: -1, type: -1})
         }
+    }
+
+    private checkHandForCard(card?: Card): number {
+        if (card)
+            for (let i = 0; i < this.hand.length; i++) {
+                if (this.hand[i].number === card.number && this.hand[i].type === card.type)
+                    return i
+            }
+        return -1
     }
 }
 
