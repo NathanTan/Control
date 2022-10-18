@@ -163,13 +163,23 @@ class Player {
         }
     }
 
-    private diffuse(card: Card): PlayResult {
+    // Discard a card and destory a card on your opponents field of equal or lower value
+    private diffuse(card: Card, targetField: Card[]): PlayResult {
         const result = {success: false, next: undefined, playersScore: -1 } as PlayResult
 
-        this.hand.sort((a, b) => a.number - b.number)
-        const position = this.hand.indexOf(card)
+        // Validation - Check the opponents field
+        // TODO: pick up here/make sure the opponent has the card, pass in the opponents field
+        const targetCardPostion = this.checkArrayForCard(targetField, card)
+        if (targetCardPostion === -1)
+            return result // Return with success = false
+
+        // Discard the card
+        const position = this.checkHandForCard(card)
         const discardedCard = this.hand.splice(position, 1)[0]
         this.graveyard.push(discardedCard)
+
+        // Destory the target card from the field
+        targetField.splice(targetCardPostion, 1)
 
         result.success = true
         result.diffuseValue = discardedCard.number
@@ -189,6 +199,15 @@ class Player {
         if (card)
             for (let i = 0; i < this.hand.length; i++) {
                 if (this.hand[i].number === card.number && this.hand[i].type === card.type)
+                    return i
+            }
+        return -1
+    }
+
+    private checkArrayForCard(arr: Card[], card?: Card): number {
+        if (card)
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i].number === card.number && arr[i].type === card.type)
                     return i
             }
         return -1
