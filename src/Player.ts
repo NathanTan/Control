@@ -4,6 +4,7 @@ import PlayResult from "./PlayResult"
 import Card from "./Interfaces/Card"
 import CardConstants from "./Constants/CardConstants"
 import CardType from "./Enums/CardType"
+import TurnData from "./Interfaces/TurnData"
 
 class Player {
     public name: string
@@ -15,6 +16,7 @@ class Player {
     private numberOfPlayers: number
     private playerIndex: number
     private testing: boolean
+    private interruptionCards = [9]
 
     constructor(name: string, numberOfPlayers: number, playerIndex: number, testing: boolean, deck?: Deck) {
         this.name = name
@@ -42,18 +44,18 @@ class Player {
         }
     }
 
-    public runAction(action: Action, card?: Card): PlayResult | undefined {
+    public runAction(turnData: TurnData): PlayResult | undefined {
         // Check if the card is not in the hand
         // Validation
-        let cardPosition = this.checkHandForCard(card)
+        let cardPosition = this.checkHandForCard(turnData.card)
         
-        if (action !== Action.Draw && (card === undefined || card === null || cardPosition === -1)) {
+        if (turnData.action !== Action.Draw && (turnData.card === undefined || turnData.card === null || cardPosition === -1)) {
             return undefined
         }
 
         let result = undefined
 
-        switch (action) {
+        switch (turnData.action) {
             case Action.Draw:
                 if (this.numberOfPlayers == 2)
                     this.drawFromPersonalDeck()
@@ -63,24 +65,25 @@ class Player {
                 }
                 break
             case Action.Play:
-                if (card)
-                    this.play(card, cardPosition) // TODO fix fallback
+                if (turnData.card)
+                    this.play(turnData.card, cardPosition) // TODO fix fallback
                 else {
                     console.log("[ERROR] No card to play")
                 }
                 break
             case Action.Activate:
                 // Validation
-                if (card !== undefined && CardConstants.CardsThatCanBeDiscarded.indexOf(card.number) == -1) {
+                if (turnData.card !== undefined && CardConstants.CardsThatCanBeDiscarded.indexOf(turnData.card.number) == -1) {
                     console.log("[ERROR] Cannot discard a stable fuel for effect now")
                     break
                 }
 
                 // Discard
-                this.discard(card ?? {} as Card) // TODO fix fallback
+                this.discard(turnData.card ?? {} as Card) // TODO fix fallback
                 break
             case Action.Diffuse:
-                result = this.diffuse(card ?? {} as Card) // TODO fix fallback
+                let targetPlayerId: number
+                result = this.diffuse(turnData.card ?? {} as Card, turnData.targetPlayerId) // TODO fix fallback
                 break
         }
 
@@ -98,6 +101,16 @@ class Player {
 
     public getDiscardPile(): string {
         return this.graveyard.map(c => c.number + " " + ((c.type === CardType.Stable) ? "s" : "u")).join(",")
+    }
+
+    public hasInterruption(): boolean {
+        for (let i = 0; i < this.hand.length; i++) {
+            if (this.interruptionCards.indexOf(this.hand[i].number) !== -1) {
+                return true
+            }
+        }
+
+        return false
     }
 
     private drawFromPersonalDeck() {
@@ -169,6 +182,7 @@ class Player {
 
         // Validation - Check the opponents field
         // TODO: pick up here/make sure the opponent has the card, pass in the opponents field
+        // TODO: move validation to the Control object - Pick up here!
         const targetCardPostion = this.checkArrayForCard(targetField, card)
         if (targetCardPostion === -1)
             return result // Return with success = false

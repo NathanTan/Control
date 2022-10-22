@@ -5,6 +5,7 @@ import Player from "./Player"
 import PlayerData from "./Interfaces/PlayerData"
 import Card from "./Interfaces/Card"
 import Action from "./Enums/Action"
+import TurnData from "./Interfaces/TurnData"
 
 class Control {
     public players: Player[]
@@ -59,8 +60,10 @@ class Control {
 
         // Get user's move
 
+        const turnData = this.createTurnData(playersAction, card)
+
         // executeMove
-        this.players[playersTurn].runAction(playersAction, card)
+        this.players[playersTurn].runAction(turnData)
         //      Allow for interuption
         // Check if the game is over
         let gameIsOver = false
@@ -78,6 +81,50 @@ class Control {
 
     public move(card: Card, action: Action) {
         
+    }
+
+
+
+    private createTurnData(action: Action, card?: Card): TurnData {
+        let targetPlayer = -1
+        let playersThatCanInterrupt = [] as number[]
+
+        switch (action) {
+            case Action.Draw:
+                break
+            case Action.Play:
+                break
+            case Action.Activate:
+                for (let i = 0; i < this.numberOfPlayers; i++) {
+                    if (this.players[i].hasInterruption()) 
+                        playersThatCanInterrupt.push(i)
+                }
+            case Action.Diffuse:
+                targetPlayer = this.determineTargetPlayer()
+            default:
+                break
+        }
+
+
+        const turnData = {
+            action: action,
+            targetPlayerId: targetPlayer,
+            card: card,
+            playersThatCanInterrupt: playersThatCanInterrupt
+        } as TurnData
+
+        return turnData
+    }
+
+    // Determine the target player
+    private determineTargetPlayer(): number {
+        // If there are only 2 players, make the other player the target
+        if (this.numberOfPlayers === 2) {
+            return ((this.turn % 2) === 0) ? 1 : 0
+        } else if (this.numberOfPlayers >= 3) {
+            console.log("[ERROR]: 3/4 player mode is not yet released.")
+        }
+        return -1
     }
 }
 
