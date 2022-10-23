@@ -12,6 +12,7 @@ class Control {
     public turn: number
     private numberOfPlayers: number
     private gameOver: boolean
+    private lastTurnWasSuccessful = false
     private testing?: boolean
     private logging?: boolean
     private debug?: boolean
@@ -43,6 +44,7 @@ class Control {
         status.turnCount = this.turn
         status.turn = this.turn % this.numberOfPlayers
         status.gameOver = this.gameOver
+        status.lastTurnWasSuccessful = this.lastTurnWasSuccessful
 
         return status
     }
@@ -70,6 +72,18 @@ class Control {
     public conductTurn(playersAction: Action, card?: Card, targetPlayer?: number, targetCard?: Card) {
         const playersTurn = this.turn % this.numberOfPlayers // The index of which player's turn it is
         if (this.logging) console.log(`Conducting Player ${playersTurn}'s turn`)
+
+        // Validation
+        if (playersAction === Action.Diffuse) {
+            if (!card || !targetCard) {
+                this.lastTurnWasSuccessful = false
+                return
+            }
+            if (card.number < targetCard?.number) {
+                this.lastTurnWasSuccessful = false
+                return
+            }
+        }
 
 
         // Draw, except on the first players first turn
@@ -106,6 +120,7 @@ class Control {
 
         // Increment turn
         this.turn++
+        this.lastTurnWasSuccessful = true
     }
 
     public move(card: Card, action: Action) {

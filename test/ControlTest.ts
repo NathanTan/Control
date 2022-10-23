@@ -24,7 +24,8 @@ describe('Control config handling', () => {
         const expectedStatus = {
             turnCount:  0,
             turn:       0,
-            gameOver:   false
+            gameOver:   false,
+            lastTurnWasSuccessful: false
         } as Status
 
         const expectedPlayer0Data_0 = {
@@ -73,6 +74,7 @@ describe('Control config handling', () => {
             turnCount: 2,
             turn: 0,
             gameOver: false,
+            lastTurnWasSuccessful: true
 
         } as Status
 
@@ -112,6 +114,7 @@ describe('Control config handling', () => {
             turnCount: 2,
             turn: 0,
             gameOver: false,
+            lastTurnWasSuccessful: true
 
         } as Status
 
