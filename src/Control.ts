@@ -16,6 +16,11 @@ class Control {
     private logging?: boolean
     private debug?: boolean
 
+    private handLimit = 7
+
+    // The id/index of the player that is forced to discard down to the hand limit. No player can play while a discard is required
+    private forceDiscard = -1 
+
     constructor(config: Config) {
         // todo: validate config
         
@@ -94,6 +99,11 @@ class Control {
                 gameIsOver = true
         }
 
+        // Discard if the player has more cards than the hand limit.
+        if (this.getPlayerData(playersTurn).hand.length > 7) {
+            this.forceDiscard = playersTurn
+        }
+
         // Increment turn
         this.turn++
     }
@@ -101,7 +111,31 @@ class Control {
     public move(card: Card, action: Action) {
     }
 
- 
+    /*
+     * Parameters:
+     *  player  - The id/index of the player to discard a card
+     *  card    - The card to be discarded
+     */
+    public discard(player: number, card: Card) {
+        if (this.forceDiscard > -1) {
+            if (this.logging) console.log(`Discarding card=${JSON.stringify(card)}`)
+            const cardPosition = this.players[player].checkHandForCard(card)
+            if (cardPosition > -1) {
+                this.players[player].discardCard(cardPosition)
+            }
+
+            // Check all the players for the hand limit
+            for (let i = 0; i < this.players.length; i++) {
+                if (this.getPlayerData(i).hand.length > 7) {
+                    this.forceDiscard = i
+                    return
+                }
+            }
+
+            this.forceDiscard = -1 // All good, no players need to discard any cards
+        }
+    }
+    
 
 
 

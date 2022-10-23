@@ -225,13 +225,20 @@ class Player {
         }
     }
 
-    private checkHandForCard(card?: Card): number {
+    public checkHandForCard(card?: Card): number {
         if (card)
             for (let i = 0; i < this.hand.length; i++) {
                 if (this.hand[i].number === card.number && this.hand[i].type === card.type)
                     return i
             }
         return -1
+    }
+
+    // Discard a card from the players hand by index
+    public discardCard(cardPosition: number) {
+        if (this.logging) console.log(`Discarding card ${JSON.stringify(this.hand[cardPosition])}`)
+        this.graveyard.push(this.hand[cardPosition])
+        this.hand.splice(cardPosition, 1)
     }
 
     private checkArrayForCard(arr: Card[], card?: Card): number {
