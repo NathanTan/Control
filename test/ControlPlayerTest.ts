@@ -23,8 +23,8 @@ describe('Control config handling', () => {
 
         const expectedPlayer1Data = {
             name: "bot2",
-            deckSize: 19,
-            hand: ["10 u","10 u","9 u","9 u", "8 u"],
+            deckSize: 20,
+            hand: ["10 u","10 u","9 u","9 u"],
             field: [""],
             discardPile: [""]
         } as PlayerData

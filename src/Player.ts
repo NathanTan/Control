@@ -16,9 +16,11 @@ class Player {
     private numberOfPlayers: number
     private playerIndex: number
     private testing: boolean
+    private logging?: boolean
+    private debug?: boolean
     private interruptionCards = [9]
 
-    constructor(name: string, numberOfPlayers: number, playerIndex: number, testing: boolean, deck?: Deck) {
+    constructor(name: string, numberOfPlayers: number, playerIndex: number, testing: boolean, deck?: Deck, logging?: boolean, debug?: boolean) {
         this.name = name
         this.numberOfPlayers = numberOfPlayers
         this.deck = (numberOfPlayers == 2) ? new Deck(numberOfPlayers, testing) : null
@@ -28,6 +30,8 @@ class Player {
         this.turnActions = [] as Action[]
         this.playerIndex = playerIndex
         this.testing = testing
+        this.logging = logging
+        this.debug = debug
         //@ts-ignore
         this.drawInitalHand(this.deck ?? deck) // one of these will have a deck depending on the number of players
     }
@@ -36,6 +40,8 @@ class Player {
         if (deck === null || deck === undefined) {
             let card: Card | undefined
             if (this.deck !== null) {
+                if (this.debug) console.log(`[DEBUG] Draw`)
+                
                 card = this.deck.drawCard()
                 if (card !== undefined) {
                     this.hand.push(card)
@@ -83,7 +89,7 @@ class Player {
                 break
             case Action.Diffuse:
                 let targetPlayerId: number
-                result = this.diffuse(turnData.card ?? {} as Card, turnData.targetPlayerId) // TODO fix fallback
+                result = this.diffuse(turnData.card ?? {} as Card) // TODO fix fallback
                 break
         }
 
@@ -111,6 +117,20 @@ class Player {
         }
 
         return false
+    }
+
+    public recieveDiffuse(card?: Card) {
+        if (this.debug) console.log(`[DEBUG] Recieving diffuse card=${JSON.stringify(card)}`)
+        if (card) {
+            const cardExists = this.checkArrayForCard(this.field, card)
+            if (this.debug) console.log(`[DEBUG] Card to diffuse at location=${JSON.stringify(cardExists)}`)
+
+
+            if(cardExists >= 0) {
+                this.field.splice(cardExists, 1)
+                this.graveyard.push(card)
+            }
+        }
     }
 
     private drawFromPersonalDeck() {
@@ -176,24 +196,20 @@ class Player {
         }
     }
 
-    // Discard a card and destory a card on your opponents field of equal or lower value
-    private diffuse(card: Card, targetField: Card[]): PlayResult {
-        const result = {success: false, next: undefined, playersScore: -1 } as PlayResult
+    // Discard a card and later in the Control class, destory a card on your opponents 
+    // field of equal or lower value
+    private diffuse(card: Card): PlayResult {
+        if (this.debug) console.log(`[DEBUG] diffuse card ${JSON.stringify(card)}`)
+        const result = {success: false, next: undefined, playersScore: -1, diffuseValue: card.number } as PlayResult
 
-        // Validation - Check the opponents field
-        // TODO: pick up here/make sure the opponent has the card, pass in the opponents field
-        // TODO: move validation to the Control object - Pick up here!
-        const targetCardPostion = this.checkArrayForCard(targetField, card)
-        if (targetCardPostion === -1)
-            return result // Return with success = false
+        // const targetCardPostion = this.checkArrayForCard(targetField, card)
+        // if (targetCardPostion === -1)
+            // return result // Return with success = false
 
         // Discard the card
         const position = this.checkHandForCard(card)
         const discardedCard = this.hand.splice(position, 1)[0]
         this.graveyard.push(discardedCard)
-
-        // Destory the target card from the field
-        targetField.splice(targetCardPostion, 1)
 
         result.success = true
         result.diffuseValue = discardedCard.number
@@ -202,7 +218,7 @@ class Player {
     }
 
     private drawInitalHand(deck: Deck) {  
-        const handCount = (this.playerIndex === 0) ? 4 : 5
+        const handCount = 4
         for (let i = 0; i < handCount; i++) {
             const card = deck.drawCard()
             this.hand.push(card ?? {number: -1, type: -1})

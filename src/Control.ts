@@ -13,6 +13,9 @@ class Control {
     private numberOfPlayers: number
     private gameOver: boolean
     private testing?: boolean
+    private logging?: boolean
+    private debug?: boolean
+
     constructor(config: Config) {
         // todo: validate config
         
@@ -20,6 +23,8 @@ class Control {
         this.numberOfPlayers = config.numberOfPlayers
         this.gameOver = false
         this.testing = config.testing ?? false
+        this.logging = config.logging ?? false
+        this.debug = config.logging ?? false
 
         this.players = [] as Player[]
         for (let i = 0; i < this.numberOfPlayers; i++) {
@@ -50,11 +55,21 @@ class Control {
         return playerData
     }
 
-    public conductTurn(playersAction: Action, card?: Card) {
+    /*
+     * Parameters:
+     *  playersAction    - The type of action a player will conduct this turn
+     *  card             - The card to be used from the player's hand if the action requires it
+     *  targetPlayer     - The id/index of the player affected by a potential effect/diffuse this turn
+     *  targetCard       - The target card of an activated effect. (Usually for destruction)
+    */
+    public conductTurn(playersAction: Action, card?: Card, targetPlayer?: number, targetCard?: Card) {
         const playersTurn = this.turn % this.numberOfPlayers // The index of which player's turn it is
+        if (this.logging) console.log(`Conducting Player ${playersTurn}'s turn`)
+
 
         // Draw, except on the first players first turn
         if (this.numberOfPlayers == 2 && this.turn > 0) {
+            if (this.logging) console.log(`Player ${playersTurn} draws`)
             this.players[playersTurn].draw()
         }
 
@@ -63,7 +78,11 @@ class Control {
         const turnData = this.createTurnData(playersAction, card)
 
         // executeMove
-        this.players[playersTurn].runAction(turnData)
+        let result = this.players[playersTurn].runAction(turnData)
+        if (result && result.diffuseValue > 0) {
+            this.players[turnData.targetPlayerId].recieveDiffuse(targetCard)
+        }
+
         //      Allow for interuption
         // Check if the game is over
         let gameIsOver = false
@@ -80,8 +99,9 @@ class Control {
     }
 
     public move(card: Card, action: Action) {
-        
     }
+
+ 
 
 
 

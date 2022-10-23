@@ -27,8 +27,28 @@ describe('Control config handling', () => {
             gameOver:   false
         } as Status
 
+        const expectedPlayer0Data_0 = {
+            name: "bot1",
+            deckSize: 20,
+            hand: ["10 u","10 u","9 u","9 u"],
+            field: [""],
+            discardPile: [""]
+        } as PlayerData
+
+        const expectedPlayer1Data_0 = {
+            name: "bot2",
+            deckSize: 20,
+            hand: ["10 u","10 u","9 u","9 u",],
+            field: [""],
+            discardPile: [""]
+        } as PlayerData
+
         assert.strictEqual(JSON.stringify(expectedStatus),
             JSON.stringify(game.getStatus()))
+        assert.strictEqual(JSON.stringify(expectedPlayer0Data_0),
+            JSON.stringify(game.getPlayerData(0)))
+        assert.strictEqual(JSON.stringify(expectedPlayer1Data_0),
+            JSON.stringify(game.getPlayerData(1)))
     })
 
     it('Handles Drawing Action', () => {
@@ -43,8 +63,8 @@ describe('Control config handling', () => {
 
         const expectedPlayer1Data = {
             name: "bot2",
-            deckSize: 17,
-            hand: ["10 u","10 u","9 u","9 u", "8 u", "8 u", "7 u"],
+            deckSize: 18,
+            hand: ["10 u","10 u","9 u","9 u", "8 u", "8 u"],
             field: [""],
             discardPile: [""]
         } as PlayerData
@@ -82,8 +102,8 @@ describe('Control config handling', () => {
 
         const expectedPlayer1Data = {
             name: "bot2",
-            deckSize: 17,
-            hand: ["10 u", "10 u", "9 u", "9 u", "8 u", "8 u", "7 u"],
+            deckSize: 18,
+            hand: ["10 u", "10 u", "9 u", "9 u", "8 u", "8 u"],
             field: [""],
             discardPile: [""]
         } as PlayerData

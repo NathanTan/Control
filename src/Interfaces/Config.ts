@@ -1,7 +1,9 @@
 interface Config {
     numberOfPlayers: number
     playerNames: string[]
-    testing?: boolean
+    testing?: boolean,
+    logging?: boolean,
+    debug?: boolean
 }
 
 export default Config
