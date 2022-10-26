@@ -52,8 +52,11 @@ class Player {
 
     public runAction(turnData: TurnData): PlayResult | undefined {
         // Check if the card is not in the hand
+        
         // Validation
         let cardPosition = this.checkHandForCard(turnData.card)
+
+        // if (this.logging && this.debug) console.log(`[DEBUG] Postition of card in hand ${cardPosition}`)
         
         if (turnData.action !== Action.Draw && (turnData.card === undefined || turnData.card === null || cardPosition === -1)) {
             return undefined
@@ -169,9 +172,12 @@ class Player {
     }
 
     private discardTryActivate(card: Card) {
-        this.hand.sort((a, b) => a.number - b.number)
-        const position = this.hand.indexOf(card)
+        if (this.logging && this.debug) console.log(`[DEBUG] Trying to activate card ${JSON.stringify(card)}`)
+
+        this.hand.sort((a, b) => a.number + b.number)
+        const position = this.checkHandForCard(card)
         this.graveyard.push(this.hand.splice(position, 1)[0])
+
 
         // Activate the effect
         switch(card.number) {

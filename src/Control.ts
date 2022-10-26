@@ -6,6 +6,7 @@ import PlayerData from "./Interfaces/PlayerData"
 import Card from "./Interfaces/Card"
 import Action from "./Enums/Action"
 import TurnData from "./Interfaces/TurnData"
+import CardType from "./Enums/CardType"
 
 class Control {
     public players: Player[]
@@ -37,7 +38,7 @@ class Control {
 
         this.players = [] as Player[]
         for (let i = 0; i < this.numberOfPlayers; i++) {
-            this.players.push(new Player(config.playerNames[i], this.numberOfPlayers, i, this.testing))
+            this.players.push(new Player(config.playerNames[i], this.numberOfPlayers, i, this.testing, undefined, this.logging, this.debug))
         }
 
     }
@@ -77,6 +78,7 @@ class Control {
         const playersTurn = this.turn % this.numberOfPlayers // The index of which player's turn it is
         if (this.logging) console.log(`Conducting Player ${playersTurn}'s turn`)
 
+
         // Validation
         if (playersAction === Action.Diffuse) {
             if (!card || !targetCard) {
@@ -88,23 +90,43 @@ class Control {
                 return
             }
         }
+        if (this.forceDiscard > -1) {
+            return
+        }
 
 
         // Draw, except on the first players first turn
         if (this.numberOfPlayers == 2 && this.turn > 0) {
-            if (this.logging) console.log(`Player ${playersTurn} draws`)
+            if (this.logging) console.log(`\nPlayer ${playersTurn} draws`)
             this.players[playersTurn].draw()
         }
 
         // Get user's move
 
         const turnData = this.createTurnData(playersAction, card)
+        if (this.logging && this.debug) console.log(`[DEBUG] TurnData: ${JSON.stringify(turnData)}`)
+        
 
         // executeMove
         let result = this.players[playersTurn].runAction(turnData)
+        if (this.logging && this.debug) console.log(`[DEBUG] here ${playersTurn}`)
+
         if (result && result.diffuseValue > 0) {
             this.players[turnData.targetPlayerId].recieveDiffuse(targetCard)
         }
+
+        // post Activations
+        if (turnData.action === Action.Activate && turnData.card)
+        switch (turnData.card.number) {
+            case 8:
+                for (let i = 0; i < this.players.length; i++) {
+                    this.players[i].wipeBoard()
+                }
+                break
+            default:
+                break
+        }
+
 
         //      Allow for interuption
         // Check if the game is over
@@ -126,10 +148,8 @@ class Control {
          */
 
         // Discard if the player has more cards than the hand limit.
-        if (this.getPlayerData(playersTurn).hand.length > 7) {
-            this.forceDiscard = playersTurn
-            this.turnIsOngoing = true
-        }
+        this.checkHandLimit(playersTurn)
+        
 
 
         // Increment turn
@@ -152,23 +172,41 @@ class Control {
      *  player  - The id/index of the player to discard a card
      *  card    - The card to be discarded
      */
-    public discard(player: number, card: Card) {
-        if (this.forceDiscard > -1) {
-            if (this.logging) console.log(`Discarding card=${JSON.stringify(card)}`)
-            const cardPosition = this.players[player].checkHandForCard(card)
-            if (cardPosition > -1) {
-                this.players[player].discardCard(cardPosition)
+    public forcedDiscard(player: number, card: Card) {
+        if (this.forceDiscard > -1 && this.cardIsValid(card)) {
+            this.discard(player, card)
+            // this.turn++
+            // this.turnIsOngoing = false
+            // this.forceDiscard = -1 // All good, no players need to discard any cards
+
+            this.checkHandLimit(player)
+
+            if (!this.turnIsOngoing) {
+                this.turn++
             }
 
-            // Check all the players for the hand limit
-            for (let i = 0; i < this.players.length; i++) {
-                if (this.getPlayerData(i).hand.length > 7) {
-                    this.forceDiscard = i
-                    return
-                }
-            }
 
-            this.forceDiscard = -1 // All good, no players need to discard any cards
+        }
+    }
+
+    /*
+     * Parameters:
+     *  player  - The id/index of the player to discard a card
+     *  card    - The card to be discarded
+     */
+    private discard(player: number, card: Card) {
+        if (this.logging) console.log(`Discarding card=${JSON.stringify(card)}`)
+        const cardPosition = this.players[player].checkHandForCard(card)
+        if (cardPosition > -1) {
+            this.players[player].discardCard(cardPosition)
+        }
+
+        // Check all the players for the hand limit
+        for (let i = 0; i < this.players.length; i++) {
+            if (this.getPlayerData(i).hand.length > 7) {
+                this.forceDiscard = i
+                return
+            }
         }
     }
     
@@ -215,6 +253,37 @@ class Control {
             console.log("[ERROR]: 3/4 player mode is not yet released.")
         }
         return -1
+    }
+
+    // Validate that the card is legal
+    private cardIsValid(card?: Card): boolean {
+        if (card) {
+            if (card.number < 0 || card.number > 10) {
+                return false
+            } 
+            if (card.type !== CardType.Stable && card.type !== CardType.Unstable) {
+                return false
+            }
+        } else {
+            return false
+        }
+
+        return true
+    }
+
+    /*
+     * Parameters:
+     *  playersTurn  - The id/index of the player's hand to check
+     */
+    private checkHandLimit(playersTurn: number) {
+        if (this.getPlayerData(playersTurn).hand.length > 7) {
+            if (this.logging && this.debug) console.log(`[DEBUG] Player ${playersTurn} has ${this.getPlayerData(playersTurn).hand.length} cards. Forcing discard`)
+            this.forceDiscard = playersTurn
+            this.turnIsOngoing = true
+        } else {
+            this.forceDiscard = -1
+            this.turnIsOngoing = false
+        }
     }
 }
 

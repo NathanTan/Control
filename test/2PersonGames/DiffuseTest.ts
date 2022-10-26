@@ -11,8 +11,8 @@ const config = {
     numberOfPlayers: 2,
     playerNames: ["bot1", "bot2"],
     testing: true,
-    logging: true,
-    debug: true
+    // logging: true,
+    // debug: true
 } as Config
 
 const c = (value: number, type: CardType): Card => {
