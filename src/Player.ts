@@ -78,17 +78,16 @@ class Player {
                 }
                 break
             case Action.Activate:
-                // Validation
+                // Validation todo - validate in Control object
                 if (turnData.card !== undefined && CardConstants.CardsThatCanBeDiscarded.indexOf(turnData.card.number) == -1) {
                     console.log("[ERROR] Cannot discard a stable fuel for effect now")
                     break
                 }
 
                 // Discard
-                this.discard(turnData.card ?? {} as Card) // TODO fix fallback
+                this.discardTryActivate(turnData.card ?? {} as Card) // TODO fix fallback
                 break
             case Action.Diffuse:
-                let targetPlayerId: number
                 result = this.diffuse(turnData.card ?? {} as Card) // TODO fix fallback
                 break
         }
@@ -161,7 +160,7 @@ class Player {
                 console.log("[DEBUG] Activate 4")
                 break
             default:
-                console.log(`[DEBUG] No effect to activate for card {${card.number} ${card.type}}`)
+                if (this.logging && this.debug) console.log(`[DEBUG] No effect to activate for card {${card.number} ${card.type}}`)
         }
         
         result.success = true
@@ -169,7 +168,7 @@ class Player {
         return result
     }
 
-    private discard(card: Card) {
+    private discardTryActivate(card: Card) {
         this.hand.sort((a, b) => a.number - b.number)
         const position = this.hand.indexOf(card)
         this.graveyard.push(this.hand.splice(position, 1)[0])
@@ -189,7 +188,7 @@ class Player {
                 console.log("[DEBUG] Activate 7")
                 break
             case 8:
-                console.log("[DEBUG] Activate 8")
+                if (this.logging && this.debug) console.log("[DEBUG] Activate 8")
                 break
             default:
                 console.log("[DEBUG] No effect to activate")
@@ -239,6 +238,14 @@ class Player {
         if (this.logging) console.log(`Discarding card ${JSON.stringify(this.hand[cardPosition])}`)
         this.graveyard.push(this.hand[cardPosition])
         this.hand.splice(cardPosition, 1)
+    }
+
+    // For executing the effect of an 8 action
+    public wipeBoard() {
+        for (let i = 0; i < this.field.length; i++) {
+            this.graveyard.push(this.field[i])
+        }
+        this.field = []
     }
 
     private checkArrayForCard(arr: Card[], card?: Card): number {

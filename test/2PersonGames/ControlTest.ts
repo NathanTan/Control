@@ -1,11 +1,11 @@
 var assert = require('assert')  
-import Control from "../src/Control"
-import Status from "../src/Interfaces/Status"
-import Card from "../src/Interfaces/Card"
-import Config from "../src/Interfaces/Config"
-import PlayerData from "../src/Interfaces/PlayerData"
-import Action from "../src/Enums/Action"
-import CardType from "../src/Enums/CardType"
+import Control from "../../src/Control"
+import Status from "../../src/Interfaces/Status"
+import Card from "../../src/Interfaces/Card"
+import Config from "../../src/Interfaces/Config"
+import PlayerData from "../../src/Interfaces/PlayerData"
+import Action from "../../src/Enums/Action"
+import CardType from "../../src/Enums/CardType"
 
 
 const config = {
@@ -25,7 +25,8 @@ describe('Control config handling', () => {
             turnCount:  0,
             turn:       0,
             gameOver:   false,
-            lastTurnWasSuccessful: false
+            lastTurnWasSuccessful: false,
+            turnIsOngoing: false
         } as Status
 
         const expectedPlayer0Data_0 = {
@@ -74,8 +75,8 @@ describe('Control config handling', () => {
             turnCount: 2,
             turn: 0,
             gameOver: false,
-            lastTurnWasSuccessful: true
-
+            lastTurnWasSuccessful: true,
+            turnIsOngoing: false
         } as Status
 
         game.conductTurn(Action.Draw)
@@ -114,8 +115,8 @@ describe('Control config handling', () => {
             turnCount: 2,
             turn: 0,
             gameOver: false,
-            lastTurnWasSuccessful: true
-
+            lastTurnWasSuccessful: true,
+            turnIsOngoing: false
         } as Status
 
         game.conductTurn(Action.Play, c(10, CardType.Unstable))

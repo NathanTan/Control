@@ -1,10 +1,10 @@
 var assert = require('assert')  
-import Control from "../src/Control"
-import Card from "../src/Interfaces/Card"
-import Config from "../src/Interfaces/Config"
-import PlayerData from "../src/Interfaces/PlayerData"
-import Action from "../src/Enums/Action"
-import CardType from "../src/Enums/CardType"
+import Control from "../../src/Control"
+import Card from "../../src/Interfaces/Card"
+import Config from "../../src/Interfaces/Config"
+import PlayerData from "../../src/Interfaces/PlayerData"
+import Action from "../../src/Enums/Action"
+import CardType from "../../src/Enums/CardType"
 
 
 const config = {

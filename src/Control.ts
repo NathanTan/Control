@@ -13,9 +13,11 @@ class Control {
     private numberOfPlayers: number
     private gameOver: boolean
     private lastTurnWasSuccessful = false
+    private turnIsOngoing = false
     private testing?: boolean
     private logging?: boolean
     private debug?: boolean
+    private buffer: any[]
 
     private handLimit = 7
 
@@ -31,6 +33,7 @@ class Control {
         this.testing = config.testing ?? false
         this.logging = config.logging ?? false
         this.debug = config.logging ?? false
+        this.buffer = [] 
 
         this.players = [] as Player[]
         for (let i = 0; i < this.numberOfPlayers; i++) {
@@ -45,6 +48,7 @@ class Control {
         status.turn = this.turn % this.numberOfPlayers
         status.gameOver = this.gameOver
         status.lastTurnWasSuccessful = this.lastTurnWasSuccessful
+        status.turnIsOngoing = this.turnIsOngoing
 
         return status
     }
@@ -69,7 +73,7 @@ class Control {
      *  targetPlayer     - The id/index of the player affected by a potential effect/diffuse this turn
      *  targetCard       - The target card of an activated effect. (Usually for destruction)
     */
-    public conductTurn(playersAction: Action, card?: Card, targetPlayer?: number, targetCard?: Card) {
+    public conductTurn(playersAction: Action, card?: Card, targetPlayer?: number, targetCard?: Card, opponentCanNegate?: boolean) {
         const playersTurn = this.turn % this.numberOfPlayers // The index of which player's turn it is
         if (this.logging) console.log(`Conducting Player ${playersTurn}'s turn`)
 
@@ -113,14 +117,31 @@ class Control {
                 gameIsOver = true
         }
 
+
+        /* 
+         * Leave the turn "hanging" if
+         *      - 7 or more cards in the hand
+         *      - "4 u", "5 u", "6 u", or "7 u" is played
+         *      - "9 u" is playable by an opponen
+         */
+
         // Discard if the player has more cards than the hand limit.
         if (this.getPlayerData(playersTurn).hand.length > 7) {
             this.forceDiscard = playersTurn
+            this.turnIsOngoing = true
         }
 
+
         // Increment turn
-        this.turn++
-        this.lastTurnWasSuccessful = true
+        if (!this.turnIsOngoing) {
+            this.turn++
+            this.lastTurnWasSuccessful = true
+        }
+
+    }
+
+    public continueTurn() {
+
     }
 
     public move(card: Card, action: Action) {

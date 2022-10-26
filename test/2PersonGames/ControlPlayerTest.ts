@@ -1,7 +1,7 @@
 var assert = require('assert')  
-import Control from "../src/Control"
-import Config from "../src/Interfaces/Config"
-import PlayerData from "../src/Interfaces/PlayerData"
+import Control from "../../src/Control"
+import Config from "../../src/Interfaces/Config"
+import PlayerData from "../../src/Interfaces/PlayerData"
 
 
 const config = {
